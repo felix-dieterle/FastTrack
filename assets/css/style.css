@@ -1,0 +1,80 @@
+/* ============================================================
+   FastTrack – Custom Styles
+   Built on top of Bootstrap 5.3
+   ============================================================ */
+
+/* ── Clock button ──────────────────────────────────────────── */
+.btn-clock {
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 0.75rem 2.5rem;
+  border-radius: 50px;
+  letter-spacing: 0.03em;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-clock:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Status card ───────────────────────────────────────────── */
+.status-card {
+  border-width: 2px;
+}
+
+/* ── Stat tiles ────────────────────────────────────────────── */
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* ── Undo toast ────────────────────────────────────────────── */
+.undo-toast {
+  background: #212529;
+  color: #f8f9fa;
+  min-width: 300px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.undo-toast .toast-body {
+  font-weight: 500;
+}
+
+.undo-progress {
+  border-radius: 0;
+}
+
+/* ── Edit row highlight ────────────────────────────────────── */
+.edit-row td {
+  padding: 0.75rem 1rem;
+}
+
+/* ── Mobile tweaks ─────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .btn-clock {
+    font-size: 1.2rem;
+    padding: 0.65rem 2rem;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.85rem;
+  }
+}
