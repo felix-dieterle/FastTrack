@@ -34,6 +34,10 @@ $recent_entries = $stmt->fetchAll();
 
 // Last action for undo
 $last_action = $_SESSION['last_action'] ?? null;
+
+// Flash message from direct clock-in/out link
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -49,6 +53,14 @@ $last_action = $_SESSION['last_action'] ?? null;
 <?php include __DIR__ . '/includes/navbar.php'; ?>
 
 <div class="container py-4">
+
+  <!-- Flash message from direct clock-in/out link -->
+  <?php if ($flash): ?>
+    <div class="alert alert-<?= htmlspecialchars($flash['type']) ?> alert-dismissible fade show" role="alert">
+      <?= htmlspecialchars($flash['msg']) ?>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Schließen"></button>
+    </div>
+  <?php endif; ?>
 
   <!-- Status Card -->
   <div class="card shadow-sm mb-4 status-card <?= $open_entry ? 'border-success' : 'border-secondary' ?>">
@@ -66,6 +78,11 @@ $last_action = $_SESSION['last_action'] ?? null;
         <button id="clockBtn" class="btn btn-clock btn-danger mt-2" onclick="handleClockOut()">
           Ausstempeln
         </button>
+        <div class="mt-3 text-muted small">
+          💡 <strong>Direkt-Link:</strong>
+          <a href="/clock_out.php" class="font-monospace">/clock_out.php</a>
+          – als Lesezeichen oder Startbildschirm-Shortcut speicherbar
+        </div>
       <?php else: ?>
         <p class="mb-1 text-secondary fw-semibold fs-5">
           <span class="me-1">⚪</span> Nicht eingestempelt
@@ -73,6 +90,11 @@ $last_action = $_SESSION['last_action'] ?? null;
         <button id="clockBtn" class="btn btn-clock btn-success mt-2" onclick="handleClockIn()">
           Einstempeln
         </button>
+        <div class="mt-3 text-muted small">
+          💡 <strong>Direkt-Link:</strong>
+          <a href="/clock_in.php" class="font-monospace">/clock_in.php</a>
+          – als Lesezeichen oder Startbildschirm-Shortcut speicherbar
+        </div>
       <?php endif; ?>
     </div>
   </div>

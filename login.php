@@ -31,7 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($remember_me) {
                 set_remember_me((int)$user['id']);
             }
-            header('Location: /index.php');
+            $redirect = $_SESSION['redirect_after_login'] ?? '/index.php';
+            unset($_SESSION['redirect_after_login']);
+            // Whitelist allowed post-login redirects to prevent open-redirect attacks
+            $allowed_redirects = ['/clock_in.php', '/clock_out.php'];
+            if (!in_array($redirect, $allowed_redirects, true)) {
+                $redirect = '/index.php';
+            }
+            header('Location: ' . $redirect);
             exit;
         } else {
             $error = 'Ungültiger Benutzername oder Passwort.';

@@ -118,3 +118,44 @@ function json_response(array $data, int $status = 200): void {
     echo json_encode($data);
     exit;
 }
+
+/**
+ * Insert a new clock-in entry and store the last action in session.
+ * Returns ['entry_id' => int, 'clock_in' => string (datetime)].
+ */
+function perform_clock_in(int $user_id, PDO $db): array {
+    $stmt = $db->prepare('INSERT INTO time_entries (user_id, clock_in) VALUES (?, NOW())');
+    $stmt->execute([$user_id]);
+    $entry_id = (int)$db->lastInsertId();
+
+    $row = $db->prepare('SELECT clock_in FROM time_entries WHERE id = ?');
+    $row->execute([$entry_id]);
+    $entry = $row->fetch();
+
+    $_SESSION['last_action'] = ['type' => 'clock_in', 'entry_id' => $entry_id];
+
+    return ['entry_id' => $entry_id, 'clock_in' => $entry['clock_in']];
+}
+
+/**
+ * Set clock_out on an open entry and store the last action in session.
+ * Returns ['seconds' => int, 'clock_in' => string, 'clock_out' => string].
+ */
+function perform_clock_out(int $open_id, int $user_id, PDO $db): array {
+    $upd = $db->prepare('UPDATE time_entries SET clock_out = NOW() WHERE id = ? AND user_id = ?');
+    $upd->execute([$open_id, $user_id]);
+
+    $row = $db->prepare('SELECT clock_in, clock_out FROM time_entries WHERE id = ?');
+    $row->execute([$open_id]);
+    $entry = $row->fetch();
+
+    $seconds = strtotime($entry['clock_out']) - strtotime($entry['clock_in']);
+
+    $_SESSION['last_action'] = ['type' => 'clock_out', 'entry_id' => $open_id];
+
+    return [
+        'seconds'   => $seconds,
+        'clock_in'  => $entry['clock_in'],
+        'clock_out' => $entry['clock_out'],
+    ];
+}

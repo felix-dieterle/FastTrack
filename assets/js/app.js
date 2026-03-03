@@ -67,7 +67,7 @@ async function handleClockIn() {
     if (btn) btn.disabled = true;
 
     try {
-        const data = await postJSON('/api/clock_in.php', {});
+        const data = await postJSON('/clock_in.php', {});
         if (data.success) {
             showToast(`Eingestempelt um ${data.clock_in} Uhr`, 'success');
             showUndo('Eingestempelt');
@@ -89,7 +89,7 @@ async function handleClockOut() {
     if (btn) btn.disabled = true;
 
     try {
-        const data = await postJSON('/api/clock_out.php', {});
+        const data = await postJSON('/clock_out.php', {});
         if (data.success) {
             showToast(`Ausgestempelt – ${data.duration} gearbeitet`, 'success');
             showUndo('Ausgestempelt');
