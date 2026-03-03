@@ -10,6 +10,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/** Return true when the request is served over HTTPS. */
+function is_https(): bool {
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443);
+}
+
 /** Redirect to login if not authenticated. */
 function require_login(): void {
     check_remember_me();
@@ -31,7 +37,7 @@ function logout_user(): void {
         $db = get_db();
         $stmt = $db->prepare('DELETE FROM remember_tokens WHERE token = ?');
         $stmt->execute([$_COOKIE['remember_token']]);
-        setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+        setcookie('remember_token', '', time() - 3600, '/', '', is_https(), true);
     }
     $_SESSION = [];
     session_destroy();
@@ -53,7 +59,7 @@ function check_remember_me(): void {
     $stmt->execute([$raw]);
     $row = $stmt->fetch();
     if (!$row) {
-        setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+        setcookie('remember_token', '', time() - 3600, '/', '', is_https(), true);
         return;
     }
     // Rotate token
@@ -61,7 +67,7 @@ function check_remember_me(): void {
     $expires   = date('Y-m-d H:i:s', strtotime('+30 days'));
     $upd = $db->prepare('UPDATE remember_tokens SET token = ?, expires_at = ? WHERE id = ?');
     $upd->execute([$new_token, $expires, $row['id']]);
-    setcookie('remember_token', $new_token, strtotime('+30 days'), '/', '', false, true);
+    setcookie('remember_token', $new_token, strtotime('+30 days'), '/', '', is_https(), true);
 
     login_user((int)$row['user_id']);
 }
@@ -99,5 +105,5 @@ function set_remember_me(int $user_id): void {
         'INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)'
     );
     $stmt->execute([$user_id, $token, $expires]);
-    setcookie('remember_token', $token, strtotime('+30 days'), '/', '', false, true);
+    setcookie('remember_token', $token, strtotime('+30 days'), '/', '', is_https(), true);
 }

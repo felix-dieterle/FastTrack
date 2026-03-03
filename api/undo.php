@@ -2,10 +2,6 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['success' => false, 'message' => 'Methode nicht erlaubt.'], 405);
 }
@@ -56,12 +52,12 @@ switch ($type) {
         break;
 
     case 'entry_delete':
+        // Re-insert without the original ID to avoid AUTO_INCREMENT conflicts
         $ins = $db->prepare(
-            'INSERT INTO time_entries (id, user_id, clock_in, clock_out, note, created_at)
-             VALUES (?, ?, ?, ?, ?, ?)'
+            'INSERT INTO time_entries (user_id, clock_in, clock_out, note, created_at)
+             VALUES (?, ?, ?, ?, ?)'
         );
         $ins->execute([
-            $last_action['entry']['id'],
             $user_id,
             $last_action['entry']['clock_in'],
             $last_action['entry']['clock_out'],

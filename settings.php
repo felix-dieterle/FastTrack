@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // --- Update weekly hours ---
     if (isset($_POST['update_hours'])) {
         $weekly_hours = (float)str_replace(',', '.', $_POST['weekly_hours'] ?? '');
-        if ($weekly_hours <= 0 || $weekly_hours > 168) {
+        if ($weekly_hours < 0.1 || $weekly_hours > 168) {
             $errors[] = 'Wochenstunden müssen zwischen 0.1 und 168 liegen.';
         } else {
             $upd = $db->prepare('UPDATE users SET weekly_hours = ? WHERE id = ?');

@@ -75,10 +75,14 @@ function calculate_overtime(int $user_id, PDO $db): int {
         return 0;
     }
 
-    // Start from the Monday of that week
-    $monday = date('Y-m-d', strtotime('monday this week', strtotime($row['first_in'])));
+    // Start from the Monday of the first entry's week
+    $first_ts    = strtotime($row['first_in']);
+    $day_of_week = (int)date('N', $first_ts); // 1=Mon … 7=Sun
+    $monday      = date('Y-m-d', $first_ts - (($day_of_week - 1) * 86400));
+
     // Current week's Monday
-    $this_monday = date('Y-m-d', strtotime('monday this week'));
+    $now_dow     = (int)date('N');
+    $this_monday = date('Y-m-d', time() - (($now_dow - 1) * 86400));
 
     $overtime = 0;
     $cursor   = $monday;
