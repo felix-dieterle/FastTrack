@@ -6,17 +6,19 @@ A simple, mobile-first PHP/MySQL time-tracking web application with clock-in/clo
 
 ## Screenshots
 
+> Screenshots taken at Pixel 8a viewport (412 × 915 px)
+
 | Dashboard | Einträge |
 |-----------|----------|
-| ![Dashboard](https://github.com/user-attachments/assets/57dac471-9c6a-48c2-abfa-2c7399c8e082) | ![Einträge](https://github.com/user-attachments/assets/b5dc7367-8f22-4225-bc78-3c221634cfdf) |
+| ![Dashboard](https://github.com/user-attachments/assets/627322f8-d415-4139-8839-9a54221d6b6a) | ![Einträge](https://github.com/user-attachments/assets/70c898b2-00ce-40f9-9525-72f04b3f7197) |
 
 | Einträge – Inline-Bearbeitung | CSV Exportieren |
 |-------------------------------|-----------------|
-| ![Bearbeiten](https://github.com/user-attachments/assets/17271655-b461-4104-b761-cd3492780c0b) | ![Export](https://github.com/user-attachments/assets/ff8bd8e8-d42d-40bb-9e28-e2f2bf507076) |
+| ![Bearbeiten](https://github.com/user-attachments/assets/c9420776-7a0c-4822-8673-dc1504af5f3e) | ![Export](https://github.com/user-attachments/assets/8dcb73c2-2b18-4b32-a75a-58d002d2bf67) |
 
 | Einstellungen | Anmelden |
 |---------------|----------|
-| ![Einstellungen](https://github.com/user-attachments/assets/71f6ed9f-d1fd-4041-b278-a4937e95a0b9) | ![Login](https://github.com/user-attachments/assets/dfd2912c-341d-46bf-8e5a-9e58875d7be6) |
+| ![Einstellungen](https://github.com/user-attachments/assets/ea97b178-c232-4f3b-b04c-61598869122e) | ![Login](https://github.com/user-attachments/assets/9fda6de8-d46d-4cb5-ab52-5bf4fd9a9173) |
 
 ---
 
