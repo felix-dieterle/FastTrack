@@ -1,6 +1,8 @@
 config.php
 .env
-vendor/
+/vendor/
+# Keep assets/vendor (bundled Bootstrap)
+!/assets/vendor/
 .DS_Store
 Thumbs.db
 *.log

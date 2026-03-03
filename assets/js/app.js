@@ -40,8 +40,9 @@ function showToast(message, variant = 'success') {
         document.body.appendChild(container);
     }
     const id   = 'toast_' + Date.now();
+    const variantClass = typeof bootstrap !== 'undefined' ? `text-bg-${variant}` : `alert alert-${variant}`;
     const html = `
-      <div id="${id}" class="toast align-items-center text-bg-${variant} border-0" role="alert" data-bs-delay="4000">
+      <div id="${id}" class="toast align-items-center ${variantClass} border-0" role="alert" data-bs-delay="4000">
         <div class="d-flex">
           <div class="toast-body">${message}</div>
           <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -49,9 +50,14 @@ function showToast(message, variant = 'success') {
       </div>`;
     container.insertAdjacentHTML('beforeend', html);
     const el = document.getElementById(id);
-    const t  = new bootstrap.Toast(el);
-    t.show();
-    el.addEventListener('hidden.bs.toast', () => el.remove());
+    if (typeof bootstrap !== 'undefined') {
+        const t  = new bootstrap.Toast(el);
+        t.show();
+        el.addEventListener('hidden.bs.toast', () => el.remove());
+    } else {
+        el.style.display = 'block';
+        setTimeout(() => el.remove(), 4000);
+    }
 }
 
 /* ── Clock In ───────────────────────────────────────────────── */
@@ -112,6 +118,7 @@ function showUndo(actionLabel) {
 
     document.getElementById('undoToastBody').textContent = actionLabel + ' – Rückgängig machen?';
 
+    if (typeof bootstrap === 'undefined') return;
     undoToastInst = bootstrap.Toast.getOrCreateInstance(toastEl, { autohide: false });
     undoToastInst.show();
 

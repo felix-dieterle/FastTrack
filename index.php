@@ -41,7 +41,7 @@ $last_action = $_SESSION['last_action'] ?? null;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FastTrack – Dashboard</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="bg-light">
@@ -189,7 +189,7 @@ $last_action = $_SESSION['last_action'] ?? null;
   // Pass PHP last_action to JS (safely encoded)
   const lastAction = <?= json_encode($last_action) ?>;
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
 <script src="assets/js/app.js"></script>
 <?php if ($last_action): ?>
 <script>
