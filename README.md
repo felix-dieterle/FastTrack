@@ -49,54 +49,185 @@ A simple, mobile-first PHP/MySQL time-tracking web application with clock-in/clo
 
 ## Setup
 
-### 1. Clone the repository
+### Schritt 1 – Voraussetzungen installieren
+
+Stelle sicher, dass **PHP 8.1+**, **MySQL 5.7+/8** und ein Webserver (Apache oder Nginx) installiert sind.
+
+**Ubuntu / Debian:**
 
 ```bash
-git clone https://github.com/your-org/FastTrack.git
+sudo apt update
+sudo apt install php8.1 php8.1-mysql mysql-server apache2 libapache2-mod-php8.1
+sudo a2enmod rewrite
+sudo systemctl start apache2 mysql
+```
+
+**macOS (Homebrew):**
+
+```bash
+brew install php mysql
+brew services start php
+brew services start mysql
+```
+
+**Windows:**
+Verwende [XAMPP](https://www.apachefriends.org/) oder [WAMP](https://www.wampserver.com/), die PHP, MySQL und Apache gebündelt bereitstellen.
+
+---
+
+### Schritt 2 – Repository klonen
+
+```bash
+git clone https://github.com/felix-dieterle/FastTrack.git
 cd FastTrack
 ```
 
-### 2. Create the database
+---
+
+### Schritt 3 – Datenbank anlegen
+
+Melde dich an der MySQL-Konsole an und erstelle die Datenbank:
+
+```bash
+mysql -u root -p
+```
 
 ```sql
 CREATE DATABASE fasttrack CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Optional: Eigenen Datenbankbenutzer anlegen (empfohlen für Produktion)
+CREATE USER 'fasttrack_user'@'localhost' IDENTIFIED BY 'DEIN_SICHERES_PASSWORT';
+GRANT ALL PRIVILEGES ON fasttrack.* TO 'fasttrack_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
 ```
 
-### 3. Run the migration script
+---
+
+### Schritt 4 – Datenbankschema importieren
 
 ```bash
 mysql -u root -p fasttrack < database/001_initial_schema.sql
 ```
 
-### 4. Configure the application
+---
+
+### Schritt 5 – Konfigurationsdatei erstellen
 
 ```bash
 cp config.example.php config.php
 ```
 
-Open `config.php` and set your database credentials:
+Öffne `config.php` und trage deine Datenbankzugangsdaten ein:
 
 ```php
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'fasttrack');
-define('DB_USER', 'your_db_user');
-define('DB_PASS', 'your_db_password');
+define('DB_USER', 'fasttrack_user');   // Benutzer aus Schritt 3
+define('DB_PASS', 'DEIN_SICHERES_PASSWORT'); // Passwort aus Schritt 3
 define('DB_CHARSET', 'utf8mb4');
 ```
 
-> ⚠️ `config.php` is listed in `.gitignore` and will never be committed.
+> ⚠️ `config.php` ist in `.gitignore` eingetragen und wird niemals ins Repository übertragen.
 
-### 5. Start the development server (optional)
+---
+
+### Schritt 6 – Webserver konfigurieren
+
+#### Option A: Eingebauter PHP-Entwicklungsserver (schnell & einfach)
 
 ```bash
 php -S localhost:8080
 ```
 
-Then open <http://localhost:8080> in your browser.
+Öffne anschließend <http://localhost:8080> im Browser. Dieser Server eignet sich **nur für die lokale Entwicklung**.
 
-### 6. Register your first user
+#### Option B: Apache Virtual Host
 
-Navigate to `/register.php` and create an account. Weekly hours default to **40h** and can be changed in Settings.
+Erstelle eine neue Konfigurationsdatei (z. B. `/etc/apache2/sites-available/fasttrack.conf`):
+
+```apache
+<VirtualHost *:80>
+    ServerName fasttrack.local
+    DocumentRoot /var/www/html/FastTrack
+
+    <Directory /var/www/html/FastTrack>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/fasttrack_error.log
+    CustomLog ${APACHE_LOG_DIR}/fasttrack_access.log combined
+</VirtualHost>
+```
+
+Aktiviere die Seite und starte Apache neu:
+
+```bash
+sudo a2ensite fasttrack.conf
+sudo systemctl reload apache2
+```
+
+#### Option C: Nginx Server Block
+
+Erstelle eine neue Konfigurationsdatei (z. B. `/etc/nginx/sites-available/fasttrack`):
+
+```nginx
+server {
+    listen 80;
+    server_name fasttrack.local;
+    root /var/www/html/FastTrack;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+    }
+}
+```
+
+Aktiviere den Block und starte Nginx neu:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/fasttrack /etc/nginx/sites-enabled/
+sudo systemctl reload nginx
+```
+
+---
+
+### Schritt 7 – Dateiberechtigungen setzen (Linux/macOS)
+
+```bash
+# Webserver-Benutzer Lesezugriff geben
+sudo chown -R www-data:www-data /var/www/html/FastTrack
+# config.php vor anderen Benutzern schützen
+chmod 640 /var/www/html/FastTrack/config.php
+```
+
+> Unter macOS mit dem eingebauten PHP-Server sind diese Schritte nicht notwendig.
+
+---
+
+### Schritt 8 – Ersten Benutzer registrieren
+
+Öffne im Browser `/register.php` (z. B. <http://localhost:8080/register.php>) und lege einen Account an.  
+Die Wochenstundenzahl ist standardmäßig auf **40 Stunden** gesetzt und kann jederzeit unter *Einstellungen* geändert werden.
+
+---
+
+### Schritt 9 – Fertig 🎉
+
+Nach der Registrierung wirst du automatisch zur Startseite weitergeleitet. Du kannst dich jetzt ein- und ausstempeln, Einträge bearbeiten und deine Arbeitszeiten exportieren.
+
+| Seite | URL |
+|-------|-----|
+| Dashboard | `/index.php` |
+| Einträge | `/entries.php` |
+| Exportieren | `/export.php` |
+| Einstellungen | `/settings.php` |
 
 ---
 
