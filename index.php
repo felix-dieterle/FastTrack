@@ -75,6 +75,13 @@ unset($_SESSION['flash']);
         <?php if ($open_entry['note']): ?>
           <p class="text-muted small mb-2"><?= htmlspecialchars($open_entry['note']) ?></p>
         <?php endif; ?>
+        <?php if (!empty($open_entry['service_type'])): ?>
+          <p class="mb-2">
+            <span class="badge bg-info text-dark">
+              <?= htmlspecialchars(service_type_label($open_entry['service_type'])) ?>
+            </span>
+          </p>
+        <?php endif; ?>
         <button id="clockBtn" class="btn btn-clock btn-danger mt-2" onclick="handleClockOut()">
           Ausstempeln
         </button>
@@ -87,6 +94,14 @@ unset($_SESSION['flash']);
         <p class="mb-1 text-secondary fw-semibold fs-5">
           <span class="me-1">⚪</span> Nicht eingestempelt
         </p>
+        <div class="mt-2 mb-2" style="max-width:280px; margin:auto;">
+          <label for="serviceTypeSelect" class="form-label small mb-1">Einsatzart (optional)</label>
+          <select id="serviceTypeSelect" class="form-select form-select-sm">
+            <option value="">– Allgemein –</option>
+            <option value="haushaltshilfe">Haushaltshilfe</option>
+            <option value="dorfhelferin">Dorfhelferin</option>
+          </select>
+        </div>
         <button id="clockBtn" class="btn btn-clock btn-success mt-2" onclick="handleClockIn()">
           Einstempeln
         </button>
@@ -160,6 +175,7 @@ unset($_SESSION['flash']);
                 <th>Von</th>
                 <th>Bis</th>
                 <th>Dauer</th>
+                <th>Einsatzart</th>
                 <th>Notiz</th>
               </tr>
             </thead>
@@ -175,6 +191,15 @@ unset($_SESSION['flash']);
                   <td><?= date('H:i', strtotime($entry['clock_in'])) ?></td>
                   <td><?= $entry['clock_out'] ? date('H:i', strtotime($entry['clock_out'])) : '<span class="text-success">Offen</span>' ?></td>
                   <td><?= $dur !== null ? format_duration($dur) : '–' ?></td>
+                  <td>
+                    <?php if (!empty($entry['service_type'])): ?>
+                      <span class="badge bg-info text-dark">
+                        <?= htmlspecialchars(service_type_label($entry['service_type'])) ?>
+                      </span>
+                    <?php else: ?>
+                      <span class="text-muted small">–</span>
+                    <?php endif; ?>
+                  </td>
                   <td class="text-muted small"><?= htmlspecialchars((string)($entry['note'] ?? '')) ?></td>
                 </tr>
               <?php endforeach; ?>

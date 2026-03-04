@@ -39,12 +39,13 @@ switch ($type) {
 
     case 'entry_update':
         $upd = $db->prepare(
-            'UPDATE time_entries SET clock_in = ?, clock_out = ?, note = ? WHERE id = ? AND user_id = ?'
+            'UPDATE time_entries SET clock_in = ?, clock_out = ?, note = ?, service_type = ? WHERE id = ? AND user_id = ?'
         );
         $upd->execute([
             $last_action['old']['clock_in'],
             $last_action['old']['clock_out'],
             $last_action['old']['note'],
+            $last_action['old']['service_type'] ?? null,
             $last_action['entry_id'],
             $user_id,
         ]);
@@ -54,14 +55,15 @@ switch ($type) {
     case 'entry_delete':
         // Re-insert without the original ID to avoid AUTO_INCREMENT conflicts
         $ins = $db->prepare(
-            'INSERT INTO time_entries (user_id, clock_in, clock_out, note, created_at)
-             VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO time_entries (user_id, clock_in, clock_out, note, service_type, created_at)
+             VALUES (?, ?, ?, ?, ?, ?)'
         );
         $ins->execute([
             $user_id,
             $last_action['entry']['clock_in'],
             $last_action['entry']['clock_out'],
             $last_action['entry']['note'],
+            $last_action['entry']['service_type'] ?? null,
             $last_action['entry']['created_at'],
         ]);
         $msg = 'Gelöschter Eintrag wiederhergestellt.';

@@ -60,6 +60,7 @@ $last_action = $_SESSION['last_action'] ?? null;
                 <th>Einstempeln</th>
                 <th>Ausstempeln</th>
                 <th>Dauer</th>
+                <th>Einsatzart</th>
                 <th>Notiz</th>
                 <th class="text-end">Aktionen</th>
               </tr>
@@ -79,6 +80,15 @@ $last_action = $_SESSION['last_action'] ?? null;
                   <td><?= date('H:i', strtotime($entry['clock_in'])) ?></td>
                   <td><?= $entry['clock_out'] ? date('H:i', strtotime($entry['clock_out'])) : '<span class="text-success fw-semibold">Offen</span>' ?></td>
                   <td><?= $dur !== null ? format_duration($dur) : '–' ?></td>
+                  <td>
+                    <?php if (!empty($entry['service_type'])): ?>
+                      <span class="badge bg-info text-dark">
+                        <?= htmlspecialchars(service_type_label($entry['service_type'])) ?>
+                      </span>
+                    <?php else: ?>
+                      <span class="text-muted small">–</span>
+                    <?php endif; ?>
+                  </td>
                   <td class="text-muted small"><?= htmlspecialchars((string)($entry['note'] ?? '')) ?></td>
                   <td class="text-end">
                     <button class="btn btn-sm btn-outline-primary me-1" onclick="editEntry(<?= $entry['id'] ?>)">Bearbeiten</button>
@@ -87,7 +97,7 @@ $last_action = $_SESSION['last_action'] ?? null;
                 </tr>
                 <!-- Edit row (hidden by default) -->
                 <tr id="edit-row-<?= $entry['id'] ?>" class="edit-row d-none table-warning">
-                  <td colspan="6">
+                  <td colspan="7">
                     <form class="row g-2 align-items-end py-1" onsubmit="saveEntry(event, <?= $entry['id'] ?>)">
                       <div class="col-12 col-md-3">
                         <label class="form-label small mb-1">Einstempeln</label>
@@ -99,7 +109,15 @@ $last_action = $_SESSION['last_action'] ?? null;
                         <input type="datetime-local" class="form-control form-control-sm" name="clock_out"
                                value="<?= $cout_val ?>">
                       </div>
-                      <div class="col-12 col-md-4">
+                      <div class="col-12 col-md-2">
+                        <label class="form-label small mb-1">Einsatzart</label>
+                        <select class="form-select form-select-sm" name="service_type">
+                          <option value="" <?= empty($entry['service_type']) ? 'selected' : '' ?>>– Allgemein –</option>
+                          <option value="haushaltshilfe" <?= ($entry['service_type'] ?? '') === 'haushaltshilfe' ? 'selected' : '' ?>>Haushaltshilfe</option>
+                          <option value="dorfhelferin" <?= ($entry['service_type'] ?? '') === 'dorfhelferin' ? 'selected' : '' ?>>Dorfhelferin</option>
+                        </select>
+                      </div>
+                      <div class="col-12 col-md-2">
                         <label class="form-label small mb-1">Notiz</label>
                         <input type="text" class="form-control form-control-sm" name="note"
                                value="<?= htmlspecialchars((string)($entry['note'] ?? '')) ?>"

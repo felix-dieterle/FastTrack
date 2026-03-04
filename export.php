@@ -12,7 +12,7 @@ $to   = $_GET['to']   ?? '';
 
 // Build query
 $params = [$user_id];
-$sql    = 'SELECT clock_in, clock_out, note FROM time_entries WHERE user_id = ?';
+$sql    = 'SELECT clock_in, clock_out, note, service_type FROM time_entries WHERE user_id = ?';
 
 if ($from !== '') {
     $sql      .= ' AND clock_in >= ?';
@@ -37,7 +37,7 @@ if (isset($_GET['download'])) {
     $out = fopen('php://output', 'w');
     // BOM for Excel UTF-8
     fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
-    fputcsv($out, ['Datum', 'Einstempeln', 'Ausstempeln', 'Dauer (Stunden)', 'Notiz'], ';');
+    fputcsv($out, ['Datum', 'Einstempeln', 'Ausstempeln', 'Dauer (Stunden)', 'Einsatzart', 'Notiz'], ';');
 
     foreach ($entries as $entry) {
         $date  = date('d.m.Y', strtotime($entry['clock_in']));
@@ -48,7 +48,8 @@ if (isset($_GET['download'])) {
             $secs  = strtotime($entry['clock_out']) - strtotime($entry['clock_in']);
             $hours = number_format($secs / 3600, 2, ',', '');
         }
-        fputcsv($out, [$date, $cin, $cout, $hours, $entry['note'] ?? ''], ';');
+        $service = service_type_label($entry['service_type'] ?? null);
+        fputcsv($out, [$date, $cin, $cout, $hours, $service, $entry['note'] ?? ''], ';');
     }
     fclose($out);
     exit;
@@ -120,20 +121,29 @@ if (isset($_GET['download'])) {
                   <th>Einstempeln</th>
                   <th>Ausstempeln</th>
                   <th>Dauer (h)</th>
+                  <th>Einsatzart</th>
                   <th>Notiz</th>
                 </tr>
               </thead>
               <tbody>
                 <?php foreach ($preview as $entry): ?>
                   <?php
-                    $secs  = $entry['clock_out'] ? (strtotime($entry['clock_out']) - strtotime($entry['clock_in'])) : null;
-                    $hours = $secs !== null ? number_format($secs / 3600, 2, ',', '') : '–';
+                    $secs    = $entry['clock_out'] ? (strtotime($entry['clock_out']) - strtotime($entry['clock_in'])) : null;
+                    $hours   = $secs !== null ? number_format($secs / 3600, 2, ',', '') : '–';
+                    $service = service_type_label($entry['service_type'] ?? null);
                   ?>
                   <tr>
                     <td><?= date('d.m.Y', strtotime($entry['clock_in'])) ?></td>
                     <td><?= date('H:i', strtotime($entry['clock_in'])) ?></td>
                     <td><?= $entry['clock_out'] ? date('H:i', strtotime($entry['clock_out'])) : '–' ?></td>
                     <td><?= $hours ?></td>
+                    <td>
+                      <?php if ($service !== ''): ?>
+                        <span class="badge bg-info text-dark"><?= htmlspecialchars($service) ?></span>
+                      <?php else: ?>
+                        <span class="text-muted">–</span>
+                      <?php endif; ?>
+                    </td>
                     <td class="text-muted small"><?= htmlspecialchars((string)($entry['note'] ?? '')) ?></td>
                   </tr>
                 <?php endforeach; ?>

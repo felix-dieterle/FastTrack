@@ -15,6 +15,7 @@ $entry_id  = (int)($_POST['entry_id'] ?? 0);
 $clock_in  = trim($_POST['clock_in']  ?? '');
 $clock_out = trim($_POST['clock_out'] ?? '');
 $note      = trim($_POST['note']      ?? '');
+$service_type = sanitize_service_type($_POST['service_type'] ?? null);
 
 if (!$entry_id || $clock_in === '') {
     json_response(['success' => false, 'message' => 'Ungültige Eingabedaten.']);
@@ -49,9 +50,10 @@ $_SESSION['last_action'] = [
     'type'     => 'entry_update',
     'entry_id' => $entry_id,
     'old'      => [
-        'clock_in'  => $old['clock_in'],
-        'clock_out' => $old['clock_out'],
-        'note'      => $old['note'],
+        'clock_in'     => $old['clock_in'],
+        'clock_out'    => $old['clock_out'],
+        'note'         => $old['note'],
+        'service_type' => $old['service_type'] ?? null,
     ],
 ];
 
@@ -59,8 +61,8 @@ $cin_db  = date('Y-m-d H:i:s', $cin_ts);
 $cout_db = $cout_ts ? date('Y-m-d H:i:s', $cout_ts) : null;
 
 $upd = $db->prepare(
-    'UPDATE time_entries SET clock_in = ?, clock_out = ?, note = ? WHERE id = ? AND user_id = ?'
+    'UPDATE time_entries SET clock_in = ?, clock_out = ?, note = ?, service_type = ? WHERE id = ? AND user_id = ?'
 );
-$upd->execute([$cin_db, $cout_db, $note !== '' ? $note : null, $entry_id, $user_id]);
+$upd->execute([$cin_db, $cout_db, $note !== '' ? $note : null, $service_type, $entry_id, $user_id]);
 
 json_response(['success' => true]);
