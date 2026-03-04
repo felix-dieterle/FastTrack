@@ -66,8 +66,11 @@ async function handleClockIn() {
     const btn = document.getElementById('clockBtn');
     if (btn) btn.disabled = true;
 
+    const serviceSelect = document.getElementById('serviceTypeSelect');
+    const serviceType   = serviceSelect ? serviceSelect.value : '';
+
     try {
-        const data = await postJSON('/clock_in.php', {});
+        const data = await postJSON('/clock_in.php', { service_type: serviceType });
         if (data.success) {
             showToast(`Eingestempelt um ${data.clock_in} Uhr`, 'success');
             showUndo('Eingestempelt');

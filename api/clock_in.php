@@ -19,22 +19,13 @@ if ($open) {
     json_response(['success' => false, 'message' => 'Du bist bereits eingestempelt.']);
 }
 
-$stmt = $db->prepare('INSERT INTO time_entries (user_id, clock_in) VALUES (?, NOW())');
-$stmt->execute([$user_id]);
-$entry_id = (int)$db->lastInsertId();
+$service_type = sanitize_service_type($_POST['service_type'] ?? null);
 
-// Fetch the inserted clock_in time
-$row = $db->prepare('SELECT clock_in FROM time_entries WHERE id = ?');
-$row->execute([$entry_id]);
-$entry = $row->fetch();
-
-$_SESSION['last_action'] = [
-    'type'     => 'clock_in',
-    'entry_id' => $entry_id,
-];
+$result = perform_clock_in($user_id, $db, $service_type);
 
 json_response([
-    'success'  => true,
-    'entry_id' => $entry_id,
-    'clock_in' => date('H:i', strtotime($entry['clock_in'])),
+    'success'      => true,
+    'entry_id'     => $result['entry_id'],
+    'clock_in'     => date('H:i', strtotime($result['clock_in'])),
+    'service_type' => $service_type,
 ]);

@@ -120,12 +120,35 @@ function json_response(array $data, int $status = 200): void {
 }
 
 /**
+ * Validate and normalise a service_type value.
+ * Returns 'haushaltshilfe', 'dorfhelferin', or null.
+ */
+function sanitize_service_type(?string $value): ?string {
+    $allowed = ['haushaltshilfe', 'dorfhelferin'];
+    return in_array($value, $allowed, true) ? $value : null;
+}
+
+/**
+ * Return the human-readable label for a service_type value, or '' if unknown.
+ */
+function service_type_label(?string $value): string {
+    $labels = [
+        'haushaltshilfe' => 'Haushaltshilfe',
+        'dorfhelferin'   => 'Dorfhelferin',
+    ];
+    return $labels[$value ?? ''] ?? '';
+}
+
+/**
  * Insert a new clock-in entry and store the last action in session.
  * Returns ['entry_id' => int, 'clock_in' => string (datetime)].
  */
-function perform_clock_in(int $user_id, PDO $db): array {
-    $stmt = $db->prepare('INSERT INTO time_entries (user_id, clock_in) VALUES (?, NOW())');
-    $stmt->execute([$user_id]);
+function perform_clock_in(int $user_id, PDO $db, ?string $service_type = null): array {
+    $service_type = sanitize_service_type($service_type);
+    $stmt = $db->prepare(
+        'INSERT INTO time_entries (user_id, clock_in, service_type) VALUES (?, NOW(), ?)'
+    );
+    $stmt->execute([$user_id, $service_type]);
     $entry_id = (int)$db->lastInsertId();
 
     $row = $db->prepare('SELECT clock_in FROM time_entries WHERE id = ?');

@@ -37,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         json_response(['success' => false, 'message' => 'Du bist bereits eingestempelt.']);
     }
 
-    $result = perform_clock_in($user_id, $db);
+    $service_type = sanitize_service_type($_POST['service_type'] ?? null);
+    $result = perform_clock_in($user_id, $db, $service_type);
 
     json_response([
         'success'  => true,
